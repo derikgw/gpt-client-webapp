@@ -41,13 +41,30 @@ To use the application, follow these steps:
 
 This application requires an OpenAI API key. Place your API key in a file named `api_key.txt` in the root directory of the project.
 
+Ensure you have an OpenAI API key to use the GPT-4 features.
+
 ## Dependencies
 
 - Flask
 - openai-python
 - markdown
+- Prism
 
-Ensure you have an OpenAI API key to use the GPT-4 features.
+## Syntax Highlighting with Prism.js
+
+This application uses Prism.js for syntax highlighting in the generated code snippets, enhancing readability and user experience. To integrate Prism.js:
+
+1. Include Prism.css in your HTML to style the code snippets:
+   ```html
+   <link href="static/css/prism.css" rel="stylesheet" />
+   ```
+2. Include Prism.js before the closing `</body>` tag to enable highlighting:
+   ```html
+   <script src="static/js/prism.js"></script>
+   ```
+3. Ensure your code snippets are within `<pre><code class="language-xxx">...</code></pre>` tags, replacing `xxx` with the appropriate programming language identifier.
+
+For more information on Prism.js and its usage, visit the [Prism.js website](https://prismjs.com/).
 
 ## License
 
