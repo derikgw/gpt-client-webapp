@@ -1,7 +1,7 @@
 Certainly! Below you'll find a Python script using the 'markdown' module to read a Markdown file and render it to HTML. In case you haven't already, you'll first need to install the 'markdown' module. You can do this through your terminal or command prompt using pip:
-
+Testing line
 ```
-pip install markdown
+pip install markdown > output.txt
 ```
 
 Once you have the module installed, here's a script that accomplishes the task:
@@ -18,7 +18,7 @@ def markdown_to_html(markdown_filepath, html_output_path):
     markdown_filepath (str): The path to the markdown file.
     html_output_path (str): The path where the HTML file will be saved.
     """
-
+    # test line
     # Attempt to read the Markdown file
     try:
         with open(markdown_filepath, 'r', encoding='utf-8') as md_file:

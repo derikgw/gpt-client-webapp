@@ -8,16 +8,34 @@ body {
     padding: 20px;
 }
 
+.promptInput {
+    width: 100%; /* Makes the textarea span the full width of its container */
+    min-height: 100px; /* Sets a minimum height for the textarea */
+    box-sizing: border-box; /* Ensures padding doesn't affect the overall width */
+    padding: 10px; /* Adds some padding inside the textarea for better readability */
+    margin-bottom: 10px; /* Adds some space below the textarea */
+    border: 1px solid #ccc; /* Gives a subtle border to the textarea */
+    font-family: Arial, sans-serif; /* Sets the font, change as needed */
+}
+
+.form-container {
+    width: 95%; /* Adjust this as necessary to control the form's width */
+    margin: auto; /* Centers the form-container if it doesn't take full width */
+}
+
 .prompt-box {
     white-space: pre-wrap;
     overflow-wrap: break-word;
-    background-color: #efda85;
+    background-color: #efda85; /* Choose a color that fits your design */
     padding: 10px;
     border-radius: 5px;
+    border: 2px solid #333; /* Added a nice border */
     font-size: 14px;
     line-height: 1.5;
     margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Added a subtle shadow for depth */
 }
+
 
 .generate-button {
     margin-left: 10px;

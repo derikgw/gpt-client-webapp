@@ -2,14 +2,18 @@ import os
 import re
 from openai import OpenAI
 import markdown
-from flask import Flask, request, url_for, render_template
+from flask import Flask, request, url_for, jsonify, render_template
 import markdown.extensions.fenced_code
 
 os.environ['FLASK_DEBUG'] = "1"
 
 # Flag for mocking GPT calls
-MOCK_GPT_CALL = True  # Set to False to use the real API
+MOCK_GPT_CALL = False  # Set to False to use the real API
 MOCK_RESPONSE_FILE = "data/mock_response.md"  # Path to your mock response markdown file
+
+# Store the conversation history
+conversation_history = []
+
 
 class OpenAIPlayground:
     def __init__(self, api_key):
@@ -64,31 +68,60 @@ os.environ['OPENAI_API_KEY'] = api_key
 openai_playground = OpenAIPlayground(api_key)
 
 
+@app.route('/generate', methods=['POST'])
+def generate():
+
+    prompt = request.form.get('prompt')
+    response = openai_playground.generate_code(prompt)
+
+    # Process the response as before
+    placeholder = "#TRIPLEBACKTICK#"
+    response_processed = re.sub(r'```', placeholder, response)
+    response_processed = response_processed.replace('`', "'")
+    response_processed = response_processed.replace(placeholder, "```")
+    md_template_string = markdown.markdown(response_processed, extensions=["fenced_code"])
+
+    # Optionally, append the new prompt and response to the conversation history
+    conversation_history.append({"prompt": prompt, "response": md_template_string})
+
+    # Return just the processed response for AJAX to insert into the page
+    return jsonify({"prompt": prompt, "response": md_template_string})
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
         prompt = request.form.get('prompt')
-        # programming_language = request.form.get('programming_language')
-        # code = openai_playground.generate_code(prompt, programming_language)
         code = openai_playground.generate_code(prompt)
 
         # Placeholder for triple backticks
         placeholder = "#TRIPLEBACKTICK#"
 
-        # Substitute triple backticks with the placeholder
+        # Process the response
         code = re.sub(r'```', placeholder, code)
-
-        # Convert remaining single backticks to an apostrophe
         code = code.replace('`', "'")
-        code = code.replace(f"{placeholder}", "```")
+        code = code.replace(placeholder, "```")
 
         md_template_string = markdown.markdown(
             code, extensions=["fenced_code"]
         )
 
-        return render_template('index.html', code=md_template_string, prompt=prompt)
+        # Pass the conversation history to the template
+        htmlString = render_template('index.html',
+                                     code=md_template_string,
+                                     prompt=prompt,
+                                     conversation_history=conversation_history)
 
-    return render_template('index.html', prompt=openai_playground.prompt)
+        # Append the new prompt and response to the conversation history
+        conversation_history.append({"prompt": prompt, "response": md_template_string})
+        return htmlString
+
+    # Also pass the conversation history when rendering the GET request
+    htmlString = render_template('index.html',
+                                 prompt=openai_playground.prompt,
+                                 conversation_history=conversation_history)
+
+    return htmlString
 
 
 if __name__ == '__main__':
