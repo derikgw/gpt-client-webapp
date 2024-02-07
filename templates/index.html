@@ -2,82 +2,9 @@
 <html>
 <head>
     <title>OpenAI Playground</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/client-styles-test.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/prism.css') }}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .prompt-box {
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .form-container {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-        }
-
-        .prompt-input {
-            flex-grow: 1;
-            min-width: 0;
-            width: 100%;
-            resize: none;
-        }
-
-        .language-select {
-            margin-left: 10px;
-        }
-
-        .generate-button {
-            margin-left: 10px;
-            background-color: #337ab7;
-            color: #fff;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        .bottom-container {
-            width: 100%;
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
-
-        /* Style for paragraph tags to ensure text wraps */
-        pre p {
-            overflow-wrap: break-word;
-            word-wrap: break-word; /* For browsers that don't support overflow-wrap */
-            white-space: normal;
-        }
-
-        pre {
-            position: relative; /* Needed to position the button absolutely relative to the pre tag */
-            padding: 10px; /* Add padding to ensure there's space for the button */
-        }
-
-        .copy-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 10; /* Ensure the button is above other content */
-            padding: 5px 10px;
-            background-color: #fff;
-            color: #000;
-            border: 1px solid #000; /* Add border for visibility */
-            cursor: pointer; /* Change cursor to indicate button */
-        }
-
-
-    </style>
-    <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main_styles.css') }}"> -->
 
 </head>
 <body>
@@ -97,13 +24,6 @@
     <div class="bottom-container">
         <div class="form-container">
             <textarea class="prompt-input" name="prompt" rows="5" placeholder="Enter prompt"></textarea>
-            <select class="language-select" name="programming_language">
-                <option value="python">Python</option>
-                <option value="javascript">JavaScript</option>
-                <option value="java">Java</option>
-                <option value="groovy">Groovy</option>
-                <option value="php">PHP</option>
-            </select>
             <button class="generate-button">Generate Code</button>
         </div>
 
@@ -111,58 +31,13 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Highlight all code blocks with Prism
-        Prism.highlightAll();
 
-        // Select all code blocks
-        var codeBlocks = document.querySelectorAll('pre code');
-
-        // Function to create and append the copy button
-        function appendCopyButton(codeBlock) {
-            var copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-button';
-            copyBtn.textContent = 'Copy';
-
-            // Event listener for the copy button
-            copyBtn.addEventListener('click', function () {
-                var range = document.createRange();
-                range.selectNodeContents(codeBlock);
-                var selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
-
-                // Execute the copy command
-                try {
-                    var successful = document.execCommand('copy');
-                    if (successful) {
-                        // Change button text to 'Copied!'
-                        this.innerText = 'Copied!';
-                        // Revert button text back to 'Copy' after 2 seconds
-                        setTimeout(() => this.innerText = 'Copy', 2000);
-                    } else {
-                        alert('Failed to copy code.');
-                    }
-                } catch (err) {
-                    console.log('Oops, unable to copy');
-                }
-
-                // Remove the selection range (deselect)
-                selection.removeAllRanges();
-            });
-
-            // Append the copy button just before the code element
-            codeBlock.parentNode.insertBefore(copyBtn, codeBlock);
-        }
-
-        // Loop through each code block and append the copy button
-        codeBlocks.forEach(appendCopyButton);
-    });
 
 
 </script>
 
 <script src="{{ url_for('static', filename='js/prism.js') }}"></script>
+<script src="{{ url_for('static', filename='js/codeBlockHandling.js') }}"></script>
 
 </body>
 </html>
