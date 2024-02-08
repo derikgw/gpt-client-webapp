@@ -10,23 +10,32 @@ document.addEventListener("DOMContentLoaded", function () {
             },
             body: 'prompt=' + encodeURIComponent(prompt)
         })
-            .then(response => response.json())
-            .then(data => {
-                // your existing code to update response
-                const historyContainer = document.querySelector(".conversation-history");
-                const newPrompt = document.createElement("div");
-                newPrompt.className = "prompt-box";
-                newPrompt.innerHTML = '<strong>Prompt:</strong><p>${data.prompt}</p>';
-                const newResponse = document.createElement("div");
-                newResponse.className = "response-box";
-                newResponse.innerHTML = '<strong>Response:</strong><pre>${data.response}</pre><button class="copy-button">Copy</button>';
-                historyContainer.appendChild(newPrompt);
-                historyContainer.appendChild(newResponse);
+        .then(response => response.json())
+        .then(data => {
+            // Assuming you update the page with the response here
+            const historyContainer = document.querySelector(".conversation-history");
+            const newPrompt = document.createElement("div");
+            newPrompt.className = "prompt-box";
+            newPrompt.innerHTML = `<strong>Prompt:</strong><p>${data.prompt}</p>`; // Use backticks for template literals
+            const newResponse = document.createElement("div");
+            newResponse.className = "response-box";
+            newResponse.innerHTML = `<strong>Response:</strong><pre>${data.response}</pre><button class="copy-button">Copy</button>`; // Use backticks for template literals
 
-                // Clear input field after submission
-                document.getElementById("promptInput").value = "";
-                window.scrollTo(0, document.body.scrollHeight);
-            })
-            .catch(error => console.error('Error:', error));
+            // Corrected logic to store history
+            let history = JSON.parse(sessionStorage.getItem('history')) || [];
+            history.push({prompt: data.prompt, response: data.response}); // Correct variable names
+            sessionStorage.setItem('history', JSON.stringify(history));
+
+            // Append new elements to the history container
+            historyContainer.appendChild(newPrompt);
+            historyContainer.appendChild(newResponse);
+
+            // Clear input field after submission
+            document.getElementById("promptInput").value = "";
+            window.scrollTo(0, document.body.scrollHeight);
+        })
+        .catch(error => console.error('Error:', error));
     });
 });
+
+

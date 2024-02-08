@@ -12,7 +12,7 @@ MOCK_GPT_CALL = False  # Set to False to use the real API
 MOCK_RESPONSE_FILE = "data/mock_response.md"  # Path to your mock response markdown file
 
 # Store the conversation history
-conversation_history = []
+# conversation_history = []
 
 
 class OpenAIPlayground:
@@ -82,7 +82,7 @@ def generate():
     md_template_string = markdown.markdown(response_processed, extensions=["fenced_code"])
 
     # Optionally, append the new prompt and response to the conversation history
-    conversation_history.append({"prompt": prompt, "response": md_template_string})
+    # conversation_history.append({"prompt": prompt, "response": md_template_string})
 
     # Return just the processed response for AJAX to insert into the page
     return jsonify({"prompt": prompt, "response": md_template_string})
@@ -109,17 +109,17 @@ def index():
         # Pass the conversation history to the template
         htmlString = render_template('index.html',
                                      code=md_template_string,
-                                     prompt=prompt,
-                                     conversation_history=conversation_history)
+                                     prompt=prompt)
+                                     #conversation_history=conversation_history)
 
         # Append the new prompt and response to the conversation history
-        conversation_history.append({"prompt": prompt, "response": md_template_string})
+        # conversation_history.append({"prompt": prompt, "response": md_template_string})
         return htmlString
 
     # Also pass the conversation history when rendering the GET request
     htmlString = render_template('index.html',
-                                 prompt=openai_playground.prompt,
-                                 conversation_history=conversation_history)
+                                 prompt=openai_playground.prompt)
+                                 # conversation_history=conversation_history)
 
     return htmlString
 
@@ -127,4 +127,5 @@ def index():
 if __name__ == '__main__':
     # debug = os.environ.get("FLASK_DEBUG") == "1"
     # app.run(debug=debug, use_reloader=not (debug and os.environ.get("PYCHARM_DEBUG") == "1"))
-    app.run(debug=True, port=5005)
+    # app.run(debug=True, port=5005)
+    app.run(host='0.0.0.0', port=80)

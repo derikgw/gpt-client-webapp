@@ -1,39 +1,27 @@
-// Function to create and append the copy button
-function appendCopyButton(codeBlock) {
-    var copyBtn = document.createElement('button');
-    copyBtn.className = 'copy-button';
-    copyBtn.textContent = 'Copy';
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to create Copy buttons
+    function addCopyButtons() {
+        const preCodeBlocks = document.querySelectorAll('pre code');
 
-    // Event listener for the copy button
-    copyBtn.addEventListener('click', function () {
-        var range = document.createRange();
-        range.selectNodeContents(codeBlock);
-        var selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+        preCodeBlocks.forEach(block => {
+            const button = document.createElement('button');
+            button.textContent = 'Copy';
+            button.className = 'copy-code-button';
+            button.addEventListener('click', function() {
+                navigator.clipboard.writeText(block.innerText).then(() => {
+                    button.textContent = 'Copied!';
+                    setTimeout(() => button.textContent = 'Copy', 2000);
+                }).catch(err => console.error('Copy failed', err));
+            });
 
-        // Execute the copy command
-        try {
-            var successful = document.execCommand('copy');
-            if (successful) {
-                // Change button text to 'Copied!'
-                this.innerText = 'Copied!';
-                // Revert button text back to 'Copy' after 2 seconds
-                setTimeout(() => this.innerText = 'Copy', 2000);
-            } else {
-                alert('Failed to copy code.');
-            }
-        } catch (err) {
-            console.log('Oops, unable to copy');
-        }
+            const pre = block.parentNode;
+            pre.insertBefore(button, pre.firstChild);
+        });
+    }
 
-        // Remove the selection range (deselect)
-        selection.removeAllRanges();
-    });
+    addCopyButtons();
+});
 
-    // Append the copy button just before the code element
-    codeBlock.parentNode.insertBefore(copyBtn, codeBlock);
-}
 
 document.addEventListener('DOMContentLoaded', function () {
     // Highlight all code blocks with Prism

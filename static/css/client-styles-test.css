@@ -69,3 +69,10 @@ pre {
     border: 1px solid #000; /* Add border for visibility */
     cursor: pointer; /* Change cursor to indicate button */
 }
+
+.copy-code-button {
+    margin-bottom: 1rem;
+    cursor: pointer;
+    /* Add more styling as per your design */
+}
+
