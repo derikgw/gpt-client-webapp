@@ -22,8 +22,8 @@ def requires_role(role):
         def decorated_function(*args, **kwargs):
             user_id = session.get('user_id')
             user = User.query.get(user_id) if user_id else None
-            if not user or user.role != role or not user.active:
-                return redirect(url_for('index'))  # or some error page
+            if not user or not user.is_admin or not user.active:
+                return redirect(request.referrer or url_for('dashboard'))  # or some error page
             return func(*args, **kwargs)
 
         return decorated_function

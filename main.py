@@ -14,6 +14,8 @@ from functools import wraps
 from flask import flash
 from datetime import datetime
 
+import sqlalchemy
+
 from utility.db_utility import db, init_app, create_tables
 from session.user import User
 
@@ -223,7 +225,7 @@ def generate():
 
 @app.route('/prompt', methods=['GET', 'POST'])
 @requires_login
-def index():
+def prompt():
     if request.method == 'POST':
         prompt = request.form.get('prompt')
         code = openai_playground.generate_code(prompt)
