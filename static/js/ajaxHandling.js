@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const historyContainer = document.querySelector(".conversation-history");
             const newPrompt = document.createElement("div");
             newPrompt.className = "prompt-box";
-            newPrompt.innerHTML = `<strong>Prompt:</strong><p>${data.prompt}</p>`; // Use backticks for template literals
+            newPrompt.textContent = `<strong>Prompt:</strong><pre><code>${data.prompt}</code></pre>`; // Use backticks for template literals
             const newResponse = document.createElement("div");
             newResponse.className = "response-box";
-            newResponse.innerHTML = `<strong>Response:</strong><pre>${data.response}</pre><button class="copy-button">Copy</button>`; // Use backticks for template literals
+            newResponse.textContent = `<strong>Response:</strong><pre>${data.response}</pre><button class="copy-button">Copy</button>`; // Use backticks for template literals
 
             // Corrected logic to store history
             let history = JSON.parse(sessionStorage.getItem('history')) || [];

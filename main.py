@@ -8,6 +8,8 @@ import markdown.extensions.fenced_code
 
 from flask import Flask, request, url_for, redirect, jsonify, render_template, g, session
 from flask_bcrypt import Bcrypt
+from markupsafe import escape
+
 
 from functools import wraps
 
@@ -203,24 +205,45 @@ def dashboard():
     return render_template('dashboard.html', username=user.username)
 
 
+from flask import flash
+
 @app.route('/generate', methods=['POST'])
 @requires_login
 def generate():
-    prompt = request.form.get('prompt')
-    response = openai_playground.generate_code(prompt)
+    prompt = escape(request.form.get('prompt'))
 
-    # Process the response as before
-    placeholder = "#TRIPLEBACKTICK#"
+    # Initialize an array to hold the contents of each file
+    file_contents = []
+
+    # Check if files were uploaded
+    files = request.files.getlist('files')
+    if files:
+        for file in files:
+            if file.filename == '':
+                flash('No selected file')
+                return redirect(request.url)
+            if file:  # If there is a file
+                # Read the content of the file
+                file_content = file.read().decode('utf-8')  # Assuming text files encoded in UTF-8
+                file_contents.append(file_content)
+
+    # Possibly concatenate file contents with the original prompt
+    files_text = '\n'.join(file_contents)
+    full_prompt = f"{prompt}\n\n{files_text}"  # Adjust as needed
+
+    # Send the concatenated prompt to GPT-4 API
+    response = openai_playground.generate_code(full_prompt)
+
+    # Process and return the response as before...
+
+    # This section remains the same
+    placeholder = "{TRIPPLETICKS}"
     response_processed = re.sub(r'```', placeholder, response)
     response_processed = response_processed.replace('`', "'")
     response_processed = response_processed.replace(placeholder, "```")
     md_template_string = markdown.markdown(response_processed, extensions=["fenced_code"])
 
-    # Optionally, append the new prompt and response to the conversation history
-    # conversation_history.append({"prompt": prompt, "response": md_template_string})
-
-    # Return just the processed response for AJAX to insert into the page
-    return jsonify({"prompt": prompt, "response": md_template_string})
+    return jsonify({"prompt": full_prompt, "response": md_template_string})
 
 
 @app.route('/prompt', methods=['GET', 'POST'])
@@ -228,6 +251,7 @@ def generate():
 def prompt():
     if request.method == 'POST':
         prompt = request.form.get('prompt')
+        prompt = escape(prompt)
         code = openai_playground.generate_code(prompt)
 
         # Placeholder for triple backticks

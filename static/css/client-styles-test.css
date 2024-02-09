@@ -37,7 +37,7 @@ body {
 }
 
 .full-width-textarea {
-  width: 100%;
+    width: 100%;
 }
 
 .generate-button {
@@ -112,4 +112,9 @@ pre {
         flex-grow: 0;
         width: 100%;
     }
+
+    p {
+        white-space: normal;
+    }
 }
+
