@@ -10,7 +10,6 @@ from flask import Flask, request, url_for, redirect, jsonify, render_template, g
 from flask_bcrypt import Bcrypt
 from markupsafe import escape
 
-
 from functools import wraps
 
 from flask import flash
@@ -48,37 +47,39 @@ class OpenAIPlayground:
 
     # def generate_code(self, prompt, programming_language):
     def generate_code(self, prompt):
+        try:
+            if MOCK_GPT_CALL:
+                # Read the mock response from the markdown file
+                with open(MOCK_RESPONSE_FILE, 'r') as file:
+                    return file.read()
 
-        if MOCK_GPT_CALL:
-            # Read the mock response from the markdown file
-            with open(MOCK_RESPONSE_FILE, 'r') as file:
-                return file.read()
+            client = OpenAI()
+            client.api_key = self.api_key
+            self.prompt = prompt
 
-        client = OpenAI()
-        client.api_key = self.api_key
-        self.prompt = prompt
+            completion_prompt = f"{prompt}:"
+            completion = client.chat.completions.create(
+                model=self.engine,
+                messages=[{"role": "user", "content": f"{completion_prompt}"}],
+                stream=True
+            )
 
-        completion_prompt = f"{prompt}:"
-        completion = client.chat.completions.create(
-            model=self.engine,
-            messages=[{"role": "user", "content": f"{completion_prompt}"}],
-            stream=True
-        )
+            fullResponse = ""
+            for chunk in completion:
+                if chunk.choices[0].delta.content is not None:
+                    # Directly append the content to fullResponse without stripping colons
+                    fullResponse += chunk.choices[0].delta.content
 
-        fullResponse = ""
-        for chunk in completion:
-            if chunk.choices[0].delta.content is not None:
-                # Directly append the content to fullResponse without stripping colons
-                fullResponse += chunk.choices[0].delta.content
+            # After the loop, strip whitespace and remove the trailing colon if it's there
+            fullResponse = fullResponse.strip()
+            if fullResponse.endswith(':'):
+                fullResponse = fullResponse[:-1]
 
-        # After the loop, strip whitespace and remove the trailing colon if it's there
-        fullResponse = fullResponse.strip()
-        if fullResponse.endswith(':'):
-            fullResponse = fullResponse[:-1]
+            return fullResponse
 
-        return fullResponse
-
-        # return "Code generation failed"
+        except openai.BadRequestError as e:
+            error_msg = e.args[0]  # Extracting the error message from the exception
+            return jsonify({"error": error_msg}), 400  # Return error message and status code
 
 
 app = Flask(__name__)
@@ -116,9 +117,11 @@ def load_logged_in_user():
     else:
         g.current_user = User.query.get(user_id)
 
+
 @app.context_processor
 def inject_user():
     return {'current_user': g.get('current_user', None)}
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -181,12 +184,12 @@ def login():
     return render_template('login.html')
 
 
-
 @app.route('/logout')
 @requires_login
 def logout():
     session.pop('user_id', None)
     return redirect('/login')
+
 
 @app.route('/')
 @app.route('/dashboard')
@@ -206,6 +209,7 @@ def dashboard():
 
 
 from flask import flash
+
 
 @app.route('/generate', methods=['POST'])
 @requires_login

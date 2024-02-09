@@ -50,6 +50,12 @@
                 <!-- Default content goes here if not overridden -->
             {% endblock %}
         </div>
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>

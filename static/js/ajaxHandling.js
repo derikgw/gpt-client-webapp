@@ -38,4 +38,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+fetch('/generate', {
+  method: 'POST',
+  body: formData,
+})
+.then(response => {
+    if (!response.ok) {
+        throw response;
+    }
+    return response.json();
+})
+.then(data => {
+    if (data.error) {
+        // Display the error on the webpage
+        document.getElementById("responseContainer").innerText = data.error;
+    } else {
+        // Handle success response
+    }
+})
+.catch(errorResponse => {
+    // Handle network errors or other non-2xx responses
+    errorResponse.json().then(errorData => {
+        // Display the error on the webpage
+        document.getElementById("responseContainer").innerText = errorData.error;
+    });
+});
 
