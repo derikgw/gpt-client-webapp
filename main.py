@@ -1,7 +1,7 @@
 import os
 import re
 
-from openai import OpenAI
+from openai import OpenAI, OpenAIError
 
 import markdown
 import markdown.extensions.fenced_code
@@ -81,7 +81,8 @@ class OpenAIPlayground:
 
             return fullResponse
 
-        except openai.BadRequestError as e:
+
+        except OpenAIError as e:
             error_msg = e.args[0]  # Extracting the error message from the exception
             return jsonify({"error": error_msg}), 400  # Return error message and status code
 
@@ -225,40 +226,68 @@ from flask import flash
 @app.route('/generate', methods=['POST'])
 @requires_login
 def generate():
-    prompt = escape(request.form.get('prompt'))
+    try:
 
-    # Initialize an array to hold the contents of each file
-    file_contents = []
+        prompt = escape(request.form.get('prompt'))
 
-    # Check if files were uploaded
-    files = request.files.getlist('files')
-    if files:
-        for file in files:
-            if file.filename == '':
-                flash('No selected file')
-                return redirect(request.url)
-            if file:  # If there is a file
-                # Read the content of the file
-                file_content = file.read().decode('utf-8')  # Assuming text files encoded in UTF-8
-                file_contents.append(file_content)
+        # Initialize an array to hold the contents of each file
+        file_contents = []
 
-    # Possibly concatenate file contents with the original prompt
-    files_text = '\n'.join(file_contents)
-    full_prompt = f"{prompt}\n\n{files_text}"  # Adjust as needed
+        # Check if files were uploaded
+        files = request.files.getlist('files')
+        if files:
+            for file in files:
+                if file.filename == '':
+                    flash('No selected file')
+                    return redirect(request.url)
+                if file:  # If there is a file
+                    # Read the content of the file
+                    file_content = file.read().decode('utf-8')  # Assuming text files encoded in UTF-8
+                    file_contents.append(file_content)
 
-    # Send the concatenated prompt to GPT-4 API
-    response = openai_playground.generate_code(full_prompt)
+        # Possibly concatenate file contents with the original prompt
+        files_text = '\n'.join(file_contents)
+        full_prompt = f"{prompt}\n\n{files_text}"  # Adjust as needed
 
-    # Process and return the response as before...
+        # Send the concatenated prompt to GPT-4 API
+        response = openai_playground.generate_code(full_prompt)
 
-    # This section remains the same
-    placeholder = "{TRIPPLETICKS}"
-    response_processed = re.sub(r'```', placeholder, response)
-    response_processed = response_processed.replace('`', "'")
-    response_processed = response_processed.replace(placeholder, "```")
-    md_template_string = markdown.markdown(response_processed, extensions=["fenced_code"])
+        # Process and return the response as before...
 
-    return jsonify({"prompt": full_prompt, "response": md_template_string})
+        # This section remains the same
+        placeholder = "{TRIPPLETICKS}"
+
+        # Existing code to generate response...
+        # Assuming `response` is the variable holding the API's return value
+
+        if isinstance(response, tuple):
+            # Log error, handle the tuple, or return an error message
+            error_msg = "Error occurred: Missing API key or other issue."
+            app.logger.error(error_msg + " Response: %s", str(response))
+            return jsonify({"error": error_msg}), 400
+        elif isinstance(response, str):
+            # Process the response as before
+            placeholder = "{TRIPPLETICKS}"
+            response_processed = re.sub(r'```', placeholder, response)
+            response_processed = response_processed.replace('`', "'")
+            response_processed = response_processed.replace(placeholder, "```")
+            md_template_string = markdown.markdown(response_processed, extensions=["fenced_code"])
+            return jsonify({"prompt": full_prompt, "response": md_template_string})
+        else:
+            # Handle other types or unexpected structures
+            return jsonify({"error": "Unexpected response format"}), 400
+
+    except Exception as e:
+        # General exception handling
+        app.logger.error("An exception occurred: %s", str(e))
+        return jsonify({"error": str(e)}), 500
+
+# response_processed = re.sub(r'```', placeholder, response)
+# response_processed = response_processed.replace('`', "'")
+# response_processed = response_processed.replace(placeholder, "```")
+# md_template_string = markdown.markdown(response_processed, extensions=["fenced_code"])
+
+# return jsonify({"prompt": full_prompt, "response": md_template_string})
 
 
 @app.route('/prompt', methods=['GET', 'POST'])

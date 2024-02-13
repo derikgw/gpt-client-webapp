@@ -14,7 +14,6 @@ admin_bp = Blueprint('admin', __name__, template_folder='templates')
 @requires_role('admin')
 @requires_login
 def admin_panel():
-    print("This is the admin panel")
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
