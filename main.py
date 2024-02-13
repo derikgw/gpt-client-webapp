@@ -19,15 +19,19 @@ import sqlalchemy
 
 from utility.db_utility import db, init_app, create_tables
 from session.user import User
+from session.role import Role
 
 from session.governance import requires_role, requires_login
+
+import logging
+from logging.handlers import RotatingFileHandler
 
 # Import the blueprints
 from admin.admin_panel import admin_bp
 from session.governance import governance_bp
 from session.profile import profile_bp
 
-os.environ['FLASK_DEBUG'] = "1"
+os.environ['FLASK_DEBUG'] = "0"
 
 # Flag for mocking GPT calls
 MOCK_GPT_CALL = False  # Set to False to use the real API
@@ -137,14 +141,21 @@ def register():
 
         hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
 
+        # Fetch the default role
+        default_role = Role.query.filter_by(name='user').first()
+        if not default_role:
+            flash('Registration error: default role not found.', 'error')
+            return redirect(url_for('register'))
+
         # Include email in the User creation
         user = User(username=username, email=email, password_hash=hashed_pw,
-                    active=False)  # Set active to False initially
+                    active=False, role=default_role)  # Set active to False initially
         db.session.add(user)
         try:
             db.session.commit()
-        except sqlalchemy.exc.IntegrityError:
+        except sqlalchemy.exc.IntegrityError as e:
             db.session.rollback()
+            app.logger.error('An error occurred: %s', str(e))
             flash('This username is already taken.', 'error')
             return redirect(url_for('register'))
 
@@ -289,7 +300,15 @@ def prompt():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)  # Set the log level you want
+    handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+
+    app.logger.addHandler(handler)
+
     # debug = os.environ.get("FLASK_DEBUG") == "1"
     # app.run(debug=debug, use_reloader=not (debug and os.environ.get("PYCHARM_DEBUG") == "1"))
     # app.run(debug=True, port=5005)
-    app.run(host='0.0.0.0', port=80)
+    app.run(host='0.0.0.0', port=5005)
