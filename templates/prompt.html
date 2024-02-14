@@ -6,17 +6,7 @@
 {% block content %}
 
     <div class="conversation-history">
-        {% for entry in conversation_history %}
-            <div class="prompt-box">
-                <strong>Prompt:</strong>
-                <p>{{ entry.prompt }}</p>
-            </div>
-            <div class="response-box">
-                <strong>Response:</strong>
-                <pre>{{ entry.response|safe }}</pre>
-                <button class="copy-button">Copy</button>
-            </div>
-        {% endfor %}
+
     </div>
 
     <div class="form-container">
