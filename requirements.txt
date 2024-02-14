@@ -50,3 +50,4 @@ types-pytz==2024.1.0.20240203
 typing_extensions==4.9.0
 tzdata==2023.4
 urllib3==2.2.0
+flask_socketio==5.3.6

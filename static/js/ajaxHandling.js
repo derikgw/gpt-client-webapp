@@ -1,66 +1,85 @@
 document.addEventListener("DOMContentLoaded", function () {
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+    // Load conversation history if exists
+    const savedHistory = localStorage.getItem('conversationHistory');
+    if (savedHistory) {
+        document.querySelector(".conversation-history").innerHTML = savedHistory;
+    }
+
     document.getElementById("promptForm").addEventListener("submit", function (e) {
-        e.preventDefault();  // Prevent the default form submission
-        const prompt = document.getElementById("promptInput").value; // Get the prompt from the form
+        e.preventDefault();
+        const prompt = document.getElementById("promptInput").value;
 
-        fetch('/generate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: 'prompt=' + encodeURIComponent(prompt)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Assuming you update the page with the response here
-            const historyContainer = document.querySelector(".conversation-history");
-            const newPrompt = document.createElement("div");
-            newPrompt.className = "prompt-box";
-            newPrompt.textContent = `<strong>Prompt:</strong><pre><code>${data.prompt}</code></pre>`; // Use backticks for template literals
-            const newResponse = document.createElement("div");
-            newResponse.className = "response-box";
-            newResponse.textContent = `<strong>Response:</strong><pre>${data.response}</pre><button class="copy-button">Copy</button>`; // Use backticks for template literals
+        // Clear the input after submitting
+        document.getElementById("promptInput").value = '';
 
-            // Corrected logic to store history
-            let history = JSON.parse(sessionStorage.getItem('history')) || [];
-            history.push({prompt: data.prompt, response: data.response}); // Correct variable names
-            sessionStorage.setItem('history', JSON.stringify(history));
+        const historyContainer = document.querySelector(".conversation-history");
+        const uniqueId = `response-${uuidv4()}`; // Generate a unique ID for the pair
 
-            // Append new elements to the history container
-            historyContainer.appendChild(newPrompt);
-            historyContainer.appendChild(newResponse);
+        // Create the prompt box div
+        const promptBox = document.createElement("div");
+        promptBox.className = "prompt-box";
+        promptBox.innerHTML = `<strong>Prompt:</strong><p>${prompt}</p>`;
 
-            // Clear input field after submission
-            document.getElementById("promptInput").value = "";
-            window.scrollTo(0, document.body.scrollHeight);
-        })
-        .catch(error => console.error('Error:', error));
+        // Create the response box div
+        const responseBox = document.createElement("div");
+        responseBox.className = "response-box";
+        responseBox.innerHTML = `<strong>Response:</strong><div id="${uniqueId}"></div><button class="copy-button" onclick="copyToClipboard(this)">Copy</button>`;
+
+        historyContainer.appendChild(promptBox)
+        historyContainer.appendChild(responseBox)
+
+        // After appending the promptBox and responseBox to the historyContainer
+        localStorage.setItem('conversationHistory', historyContainer.innerHTML);
+
+        // Send the prompt to the server using WebSocket
+        socket.emit('start_stream', {prompt: prompt, responseId: uniqueId});
+    });
+
+    // Listen for streamed responses from the server
+    socket.on('stream_response', function (data) {
+        let responseBox = document.getElementById(data.response_id)
+        let responseContent = document.createElement("div")
+        // Correct use of DOMPurify with template literals
+        responseContent.innerHTML = DOMPurify.sanitize(`${data.response}`);
+
+        responseBox.appendChild(responseContent);
+
+        // Now, find all <code> elements within the responseContent and highlight each
+        responseContent.querySelectorAll('code').forEach((block) => {
+            Prism.highlightElement(block);
+        });
+
+        // After appending the promptBox and responseBox to the historyContainer
+        const historyContainer = document.querySelector(".conversation-history");
+        localStorage.setItem('conversationHistory', historyContainer.innerHTML);
     });
 });
 
-fetch('/generate', {
-  method: 'POST',
-  body: formData,
-})
-.then(response => {
-    if (!response.ok) {
-        throw response;
-    }
-    return response.json();
-})
-.then(data => {
-    if (data.error) {
-        // Display the error on the webpage
-        document.getElementById("responseContainer").innerText = data.error;
-    } else {
-        // Handle success response
-    }
-})
-.catch(errorResponse => {
-    // Handle network errors or other non-2xx responses
-    errorResponse.json().then(errorData => {
-        // Display the error on the webpage
-        document.getElementById("responseContainer").innerText = errorData.error;
-    });
-});
 
+// Function to copy response text to clipboard
+function copyToClipboard(button) {
+    const pre = button.previousElementSibling; // Assuming the <pre> tag is right before the button
+    navigator.clipboard.writeText(pre.textContent).then(function () {
+        console.log('Copying to clipboard was successful!');
+    }, function (err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+// Function to clear conversation history
+function clearHistory() {
+    const historyContainer = document.querySelector(".conversation-history");
+    historyContainer.innerHTML = '';
+    localStorage.setItem('conversationHistory', historyContainer.innerHTML);
+}
+
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'
+        .replace(/[xy]/g, function (c) {
+            const r = Math.random() * 16 | 0,
+                v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+}
