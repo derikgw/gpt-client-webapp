@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
         const prompt = document.getElementById("promptInput").value;
 
+        // Clear the input after submitting
+        document.getElementById("promptInput").value = '';
+
         // Send the prompt to the server using WebSocket
         socket.emit('start_stream', {prompt: prompt});
     });
@@ -12,57 +15,35 @@ document.addEventListener("DOMContentLoaded", function () {
     // Listen for streamed responses from the server
     socket.on('stream_response', function(data) {
         const historyContainer = document.querySelector(".conversation-history");
-        const newResponse = document.createElement("div");
-        newResponse.className = "response-box";
-        newResponse.innerHTML = `<strong>Response:</strong><pre>${data.response}</pre><button class="copy-button">Copy</button>`;
-        historyContainer.appendChild(newResponse);
+
+        // Create the prompt box div
+        const promptBox = document.createElement("div");
+        promptBox.className = "prompt-box";
+        promptBox.innerHTML = `<strong>Prompt:</strong><p>${data.prompt}</p>`;
+
+        // Create the response box div
+        const responseBox = document.createElement("div");
+        responseBox.className = "response-box";
+        responseBox.innerHTML = `<strong>Response:</strong><pre>${data.response}</pre><button class="copy-button" onclick="copyToClipboard(this)">Copy</button>`;
+
+        // Append the new prompt and response to the conversation history
+        historyContainer.appendChild(promptBox);
+        historyContainer.appendChild(responseBox);
     });
 });
 
-
-fetch('/generate', {
-    method: 'POST',
-    body: formData,
-})
-    .then(response => {
-        if (!response.ok) {
-            throw response;
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.error) {
-            // Display the error on the webpage
-            document.getElementById("responseContainer").innerText = data.error;
-        } else {
-            // Handle success response
-        }
-    })
-    .catch(errorResponse => {
-        // Handle network errors or other non-2xx responses
-        errorResponse.json().then(errorData => {
-            // Display the error on the webpage
-            document.getElementById("responseContainer").innerText = errorData.error;
-        });
+// Function to copy response text to clipboard
+function copyToClipboard(button) {
+    const pre = button.previousElementSibling; // Assuming the <pre> tag is right before the button
+    navigator.clipboard.writeText(pre.textContent).then(function() {
+        console.log('Copying to clipboard was successful!');
+    }, function(err) {
+        console.error('Could not copy text: ', err);
     });
+}
 
-var eventSource = new EventSource("/generate_stream");
-eventSource.onmessage = function(event) {
-    var data = JSON.parse(event.data);
-    var conversationHistoryDiv = document.querySelector(".conversation-history");
-
-    var entryDiv = document.createElement("div");
-    entryDiv.innerHTML = `
-        <div class="prompt-box">
-            <strong>Prompt:</strong>
-            <p>${data.prompt}</p>
-        </div>
-        <div class="response-box">
-            <strong>Response:</strong>
-            <pre>${data.response}</pre>
-            <button class="copy-button">Copy</button>
-        </div>
-    `;
-    conversationHistoryDiv.appendChild(entryDiv);
-};
-
+// Function to clear conversation history
+function clearHistory() {
+    const historyContainer = document.querySelector(".conversation-history");
+    historyContainer.innerHTML = '';
+}

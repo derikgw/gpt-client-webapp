@@ -25,22 +25,24 @@ class OpenAIPlayground:
             completion_prompt = f"{prompt}:"
             completion = client.chat.completions.create(
                 model=self.engine,
-                messages=[{"role": "user", "content": f"{completion_prompt}"}],
+                messages=[{"role": "user", "content": f"{prompt}: "}],
                 stream=True
             )
 
-            full_response = ""
+            buffered_response = ""
             for chunk in completion:
                 if chunk.choices[0].delta.content is not None:
-                    # Directly append the content to full_response without stripping colons
-                    full_response += chunk.choices[0].delta.content
+                    # Buffer the response content
+                    buffered_response += chunk.choices[0].delta.content
 
-            # After the loop, strip whitespace and remove the trailing colon if it's there
-            full_response = full_response.strip()
-            if full_response.endswith(':'):
-                full_response = full_response[:-1]
+                    # If a certain condition is met (e.g., end of line), then yield
+                    if '\n' in buffered_response or '.' in buffered_response:
+                        yield buffered_response
+                        buffered_response = ""  # Reset the buffer after yielding
 
-            return full_response
+            # After the loop, yield any remaining buffered content
+            if buffered_response:
+                yield buffered_response
 
         except OpenAIError as e:
             error_msg = e.args[0]  # Extracting the error message from the exception
