@@ -1,0 +1,34 @@
+<!-- dashboard.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+    <div class="conversation-history">
+        {% for entry in conversation_history %}
+            <div class="prompt-box">
+                <strong>Prompt:</strong>
+                <p>{{ entry.prompt }}</p>
+            </div>
+            <div class="response-box">
+                <strong>Response:</strong>
+                <pre>{{ entry.response|safe }}</pre>
+                <button class="copy-button">Copy</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="form-container">
+        <form id="promptForm">
+            <textarea id="promptInput" name="prompt" required rows="20"></textarea>
+            <button type="submit">Generate</button>
+        </form>
+        <button id="clearHistory" onclick="clearHistory()">Clear History</button>
+        <div id="responseContainer"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/codeBlockHandling.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ajaxHandling.js') }}"></script>
+{% endblock %}
