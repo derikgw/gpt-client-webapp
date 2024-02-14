@@ -1,4 +1,6 @@
 # This file contains the OpenAIPlayground class as previously defined in main.py
+import os
+
 from flask import jsonify
 from openai import OpenAI, OpenAIError
 
@@ -29,16 +31,36 @@ class OpenAIPlayground:
                 stream=True
             )
 
+            file_path = "debug_chunks.txt"
+            # Check if the file exists
+            if os.path.exists(file_path):
+                # Delete the file
+                os.remove(file_path)
+
             buffered_response = ""
+            in_code_block = False
+            finish_code_block = False
             for chunk in completion:
                 if chunk.choices[0].delta.content is not None:
+
                     # Buffer the response content
                     buffered_response += chunk.choices[0].delta.content
 
-                    # If a certain condition is met (e.g., end of line), then yield
-                    if '\n' in buffered_response or '.' in buffered_response:
-                        yield buffered_response
-                        buffered_response = ""  # Reset the buffer after yielding
+                    if finish_code_block:
+                        finish_code_block = False
+                    else:
+                        if '``' in chunk.choices[0].delta.content or '```' in chunk.choices[0].delta.content:
+                            in_code_block = not in_code_block
+                            if '```' not in chunk.choices[0].delta.content:
+                                buffered_response += '`'
+                                yield buffered_response
+                                buffered_response = ""  # Reset the buffer after yielding
+                                finish_code_block = True
+
+                        if not in_code_block:
+                            if '\n' in buffered_response or '.' in buffered_response:
+                                yield buffered_response
+                                buffered_response = ""  # Reset the buffer after yielding
 
             # After the loop, yield any remaining buffered content
             if buffered_response:

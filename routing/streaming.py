@@ -1,3 +1,5 @@
+import re
+
 import markdown
 from flask import Blueprint, Response, request, session
 from flask_socketio import SocketIO, emit
@@ -20,12 +22,24 @@ def init(app, openai_playground):
         prompt = data['prompt']
         response_id = data['responseId']
 
+        # Buffer to store incoming partial markdown content
+        buffer = ''
+
         # Simulated streaming from openai_playground
         for response in openai_playground.generate_code(prompt):
-            md_template_string = markdown.markdown(
-                response, extensions=["fenced_code"]
-            )
-            emit('stream_response', {'response_id': response_id, 'response': md_template_string})
+
+            # Placeholder for triple backticks
+            placeholder = "#TRIPLEBACKTICK#"
+
+            # Process the response
+            response = re.sub(r'```', placeholder, response)
+            response = response.replace('`', "'")
+            response = response.replace(placeholder, "```")
+
+            html_content = markdown.markdown(response, extensions=["fenced_code"])
+            # Emit the HTML content
+            emit('stream_response', {'response_id': response_id, 'response': html_content})
+            # Update the buffer with the remaining content
 
     # Register the blueprint with the app
     app.register_blueprint(streaming_bp)
