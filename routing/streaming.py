@@ -13,7 +13,7 @@ socketio = SocketIO()
 
 
 def init(app, openai_playground):
-    socketio.init_app(app, cors_allowed_origins="gpt.derikwilson.com")
+    socketio.init_app(app, cors_allowed_origins="*")
 
     @socketio.on('start_stream')
     def handle_start_stream(data):
