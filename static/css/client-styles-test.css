@@ -36,6 +36,9 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Added a subtle shadow for depth */
 }
 
+.full-width-textarea {
+    width: 100%;
+}
 
 .generate-button {
     margin-left: 10px;
@@ -74,5 +77,44 @@ pre {
     margin-bottom: 1rem;
     cursor: pointer;
     /* Add more styling as per your design */
+}
+
+.wrapper {
+    display: flex;
+    height: 100vh; /* Use 100% of the viewport height */
+}
+
+.sidebar-nav {
+    width: 250px; /* Sidebar width */
+    background-color: #f0f0f0; /* Sidebar background color */
+    padding: 20px;
+    height: 100%; /* Make it span the full height */
+    overflow-y: auto; /* Make the sidebar scrollable if content overflows */
+}
+
+.main-content {
+    flex-grow: 1; /* Let the main content take the remaining width */
+    overflow-y: auto; /* Make the content scrollable */
+    padding: 20px;
+}
+
+.container {
+    max-width: 100%; /* Optionally, you might want to adjust this */
+}
+
+@media (max-width: 768px) {
+    .sidebar-nav {
+        width: 0;
+        overflow: hidden;
+    }
+
+    .main-content {
+        flex-grow: 0;
+        width: 100%;
+    }
+
+    p {
+        white-space: normal;
+    }
 }
 
