@@ -61,7 +61,7 @@ class OpenAIPlayground:
 
                         # Yield buffered content when outside code blocks and certain conditions are met
                         if not in_code_block:
-                            if '\n' in buffered_response or '.' in buffered_response:
+                            if '\n' in buffered_response: # or '.' in buffered_response:
                                 yield buffered_response
                                 buffered_response = ""  # Clear buffer after yielding
 
