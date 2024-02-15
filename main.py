@@ -45,4 +45,4 @@ if __name__ == '__main__':
 
     app.logger.addHandler(handler)
 
-    app.run(host='0.0.0.0', port=5005)
+    app.run(host='0.0.0.0', port=80)

@@ -13,8 +13,9 @@ socketio = SocketIO()
 
 
 def init(app, openai_playground):
-    socketio.init_app(app, cors_allowed_origins="*")
 
+    socketio.init_app(app)
+    
     @socketio.on('start_stream')
     def handle_start_stream(data):
         user_id = session.get('user_id')
