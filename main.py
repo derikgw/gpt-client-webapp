@@ -19,7 +19,7 @@ mock_response_file = os.environ.get('MOCK_RESPONSE_FILE', 'data/mock_response.md
 # Get the directory where main.py is located
 directory = os.path.dirname(os.path.abspath(__file__))
 # Pass this directory to the create_app function
-app, openai_playground = create_app(base_directory=directory, mock_gpt_call=mock_gpt_call, mock_response_file=mock_response_file)
+app, openai_playground, socketio = create_app(base_directory=directory, mock_gpt_call=mock_gpt_call, mock_response_file=mock_response_file)
 
 @app.before_request
 def load_logged_in_user():
@@ -43,6 +43,7 @@ if __name__ == '__main__':
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
 
-    app.logger.addHandler(handler)
+    socketio.logger.addHandler(handler)
+    socketio.logger.setLevel(logging.INFO)
 
-    app.run(host='0.0.0.0', port=80)
+    socketio.run(host='0.0.0.0', port=80)

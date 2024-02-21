@@ -63,4 +63,4 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     with app.app_context():
         create_tables(app)
 
-    return app, openai_playground
+    return app, openai_playground, socketio
