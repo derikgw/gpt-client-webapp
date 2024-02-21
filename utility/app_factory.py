@@ -54,7 +54,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     # cors_origins = ["http://gpt.derikwilson.com", "https://gpt.derikwilson.com"]
     # Fetch the environment variable and split it into a list
     cors_origins = os.environ.get('CORS_ORIGINS', "http://defaultorigin.com").split(',')
-    logging.info(f"Origins being loaded: {cors_origins}")
+    app.logger.info(f"Origins being loaded: {cors_origins}")
 
     CORS(app, resources={r"/*": {"origins": cors_origins}}, supports_credentials=True)
     socketio = SocketIO(app, cors_allowed_origins=cors_origins, monitor_clients=True, logger=True, engineio_logger=True,
