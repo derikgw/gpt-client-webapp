@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+    //var socket = io.connect(location.protocol + '//' + document.domain + ':5006');
 
     // Load conversation history if exists
     const savedHistory = localStorage.getItem('conversationHistory');

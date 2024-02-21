@@ -1,5 +1,6 @@
 import os
 from flask import Flask
+from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from utility.db_utility import init_app, create_tables
 from utility.openai_playground import OpenAIPlayground
@@ -19,6 +20,9 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
         base_directory = os.path.dirname(os.path.abspath(__file__))
     app = Flask(__name__, root_path=base_directory)
     # Existing configuration setup
+
+    # ToDo: Read origins in from a config file.
+    CORS(app, resources={r"/api/*": {"origins": "https://gpt.derikwilson.com"}}, supports_credentials=True)
 
     app.config['MOCK_GPT_CALL'] = mock_gpt_call
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
