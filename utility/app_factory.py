@@ -4,6 +4,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from utility.db_utility import init_app, create_tables
 from utility.openai_playground import OpenAIPlayground
+from flask_socketio import SocketIO
 
 # Assuming you have an init_streaming function in extensions.streaming
 import routing.streaming as stream_routing
@@ -23,6 +24,8 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
 
     # ToDo: Read origins in from a config file.
     CORS(app, resources={r"/*": {"origins": "https://gpt.derikwilson.com"}}, supports_credentials=True)
+
+    socketio = SocketIO(app, cors_allowed_origins="https://gpt.derikwilson.com")
 
     app.config['MOCK_GPT_CALL'] = mock_gpt_call
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
