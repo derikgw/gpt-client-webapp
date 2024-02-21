@@ -25,7 +25,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     # ToDo: Read origins in from a config file.
     CORS(app, resources={r"/*": {"origins": "https://gpt.derikwilson.com"}}, supports_credentials=True)
 
-    socketio = SocketIO(app, cors_allowed_origins="https://gpt.derikwilson.com")
+    socketio = SocketIO(app, cors_allowed_origins="https://gpt.derikwilson.com", monitor_clients=True)
 
     app.config['MOCK_GPT_CALL'] = mock_gpt_call
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
