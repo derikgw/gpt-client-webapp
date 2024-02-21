@@ -37,13 +37,4 @@ def inject_user():
 
 if __name__ == '__main__':
 
-    logging.basicConfig(level=logging.INFO)  # Set the log level you want
-    handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
-    handler.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-
-    app.logger.addHandler(handler)
-    app.logger.setLevel(logging.INFO)
-
     socketio.run(app, host='0.0.0.0', port=80)

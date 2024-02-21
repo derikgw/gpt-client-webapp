@@ -1,10 +1,16 @@
 import os
+from logging.handlers import RotatingFileHandler
+
 from flask import Flask
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
+from flask_socketio import SocketIO
+
+import logging
+from logging.handlers import RotatingFileHandler
+
 from utility.db_utility import init_app, create_tables
 from utility.openai_playground import OpenAIPlayground
-from flask_socketio import SocketIO
 
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -24,6 +30,15 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     app = Flask(__name__, root_path=base_directory)
     # Existing configuration setup
 
+    logging.basicConfig(level=logging.INFO)  # Set the log level you want
+    handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
+    handler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.INFO)
+
     app.config['MOCK_GPT_CALL'] = mock_gpt_call
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
     app.config['SECRET_KEY'] = os.environ.get('GPT_WEB_APP_AUTH_SECRET')
@@ -39,6 +54,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     # cors_origins = ["http://gpt.derikwilson.com", "https://gpt.derikwilson.com"]
     # Fetch the environment variable and split it into a list
     cors_origins = os.environ.get('CORS_ORIGINS', "http://defaultorigin.com").split(',')
+    logging.info(f"Origins being loaded: {cors_origins}")
 
     CORS(app, resources={r"/*": {"origins": cors_origins}}, supports_credentials=True)
     socketio = SocketIO(app, cors_allowed_origins=cors_origins, monitor_clients=True, logger=True, engineio_logger=True,
