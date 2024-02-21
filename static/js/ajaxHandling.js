@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem('conversationHistory', historyContainer.innerHTML);
 
         // Send the prompt to the server using WebSocket
-        // socket.emit('start_stream', {prompt: prompt, responseId: uniqueId});
-        socket.emit('start_stream', {prompt: null, responseId: uniqueId});
+        socket.emit('start_stream', {prompt: prompt, responseId: uniqueId});
+        // socket.emit('start_stream', {prompt: null, responseId: uniqueId});
     });
 
     // Listen for streamed responses from the server
