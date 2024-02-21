@@ -31,7 +31,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     # Existing configuration setup
 
     logging.basicConfig(level=logging.INFO)  # Set the log level you want
-    handler = RotatingFileHandler('app.log', maxBytes=10000, backupCount=3)
+    handler = RotatingFileHandler('logs/app.log', maxBytes=10000, backupCount=3)
     handler.setLevel(logging.INFO)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
