@@ -43,7 +43,7 @@ if __name__ == '__main__':
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
 
-    socketio.logger.addHandler(handler)
-    socketio.logger.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
+    app.logger.setLevel(logging.INFO)
 
     socketio.run(host='0.0.0.0', port=80)
