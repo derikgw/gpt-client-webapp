@@ -6,6 +6,8 @@ from utility.db_utility import init_app, create_tables
 from utility.openai_playground import OpenAIPlayground
 from flask_socketio import SocketIO
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 # Assuming you have an init_streaming function in extensions.streaming
 import routing.streaming as stream_routing
 import routing.auth as auth_routing
@@ -22,12 +24,6 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     app = Flask(__name__, root_path=base_directory)
     # Existing configuration setup
 
-    # ToDo: Read origins in from a config file.
-    cors_origins = ["http://gpt.derikwilson.com", "https://gpt.derikwilson.com"]
-    CORS(app, resources={r"/*": {"origins": cors_origins}}, supports_credentials=True)
-    socketio = SocketIO(app, cors_allowed_origins=cors_origins, monitor_clients=True, engineio_logger=True,
-                        methods=["GET", "POST"], cors_credentials=True)
-
     app.config['MOCK_GPT_CALL'] = mock_gpt_call
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
     app.config['SECRET_KEY'] = os.environ.get('GPT_WEB_APP_AUTH_SECRET')
@@ -37,6 +33,13 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     database_path = os.path.join(database_dir, 'users.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(database_path)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.wsgi_app = ProxyFix(app.wsgi_app)
+
+    # ToDo: Read origins in from a config file.
+    cors_origins = ["http://gpt.derikwilson.com", "https://gpt.derikwilson.com"]
+    CORS(app, resources={r"/*": {"origins": cors_origins}}, supports_credentials=True)
+    socketio = SocketIO(app, cors_allowed_origins=cors_origins, monitor_clients=True, engineio_logger=True,
+                        methods=["GET", "POST"], cors_credentials=True)
 
     bcrypt = Bcrypt(app)
     api_key = os.environ.get('OPENAI_API_KEY')
