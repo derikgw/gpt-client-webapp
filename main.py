@@ -46,4 +46,4 @@ if __name__ == '__main__':
     app.logger.addHandler(handler)
     app.logger.setLevel(logging.INFO)
 
-    socketio.run(host='0.0.0.0', port=80)
+    socketio.run(app, host='0.0.0.0', port=80)
