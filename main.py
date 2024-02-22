@@ -8,7 +8,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from utility.app_factory import create_app
 
-# Import the blueprints
+from asgiref.wsgi import WsgiToAsgi
 
 os.environ['FLASK_DEBUG'] = "0"
 
@@ -36,5 +36,6 @@ def inject_user():
 
 
 if __name__ == '__main__':
-
-    socketio.run(app, host='0.0.0.0', port=80)
+    # Wrap the Flask application in an ASGI application
+    asgi_app = WsgiToAsgi(app)
+    asgi_app.run(app, host='0.0.0.0', port=80)
