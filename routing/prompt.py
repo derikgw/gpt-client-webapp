@@ -15,12 +15,13 @@ def init(app, openai_playground):
         if request.method == 'POST':
             prompt_content = request.form.get('prompt')
             prompt_content = escape(prompt_content)
-            code = openai_playground.generate_code(prompt_content)
+            # code = openai_playground.generate_code(prompt_content)
 
             # Placeholder for triple backticks
             placeholder = "#TRIPLEBACKTICK#"
 
             # Process the response
+            code = ''.join(openai_playground.generate_code(prompt_content))
             code = re.sub(r'```', placeholder, code)
             code = code.replace('`', "'")
             code = code.replace(placeholder, "```")
