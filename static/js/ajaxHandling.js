@@ -1,6 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-    //var socket = io.connect(location.protocol + '//' + document.domain + ':5006');
+
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port, {
+        reconnection: true, // Enable auto-reconnection
+        reconnectionAttempts: 5, // Number of attempts before giving up
+        reconnectionDelay: 2000, // Delay between reconnection attempts
+        reconnectionDelayMax: 5000, // Maximum delay between attempts
+    });
 
     // Load conversation history if exists
     const savedHistory = localStorage.getItem('conversationHistory');
@@ -56,6 +61,15 @@ document.addEventListener("DOMContentLoaded", function () {
         // After appending the promptBox and responseBox to the historyContainer
         const historyContainer = document.querySelector(".conversation-history");
         localStorage.setItem('conversationHistory', historyContainer.innerHTML);
+    });
+
+    socket.on('reconnect_attempt', () => {
+        console.log(`Reconnect attempt...`);
+    });
+
+    // Handle reconnection failure
+    socket.on('reconnect_failed', () => {
+        console.log(`Reconnection failed. No more attempts will be made.`);
     });
 });
 
