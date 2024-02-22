@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port, {
+    var protocol = location.protocol === 'https:' ? 'wss://' : 'ws://';
+    var socket = io.connect(protocol + '//' + document.domain + ':' + location.port, {
         reconnection: true, // Enable auto-reconnection
         reconnectionAttempts: 5, // Number of attempts before giving up
         reconnectionDelay: 2000, // Delay between reconnection attempts
