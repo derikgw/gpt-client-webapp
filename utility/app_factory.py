@@ -24,6 +24,8 @@ import routing.profile as profile_routing
 import routing.admin_panel as admin_routing
 import routing.health as health_routing
 
+from asgiref.wsgi import WsgiToAsgi
+
 
 def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None):
     if base_directory is None:
@@ -88,4 +90,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     with app.app_context():
         create_tables(app)
 
-    return app, openai_playground, socketio
+    # Wrap the Flask application in an ASGI application
+    asgi_app = WsgiToAsgi(app)
+
+    return asgi_app, openai_playground, socketio
