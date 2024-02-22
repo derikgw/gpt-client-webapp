@@ -22,6 +22,7 @@ import routing.prompt as prompt_routing
 import routing.generation as generation_routing
 import routing.profile as profile_routing
 import routing.admin_panel as admin_routing
+import routing.health as health_routing
 
 
 def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None):
@@ -82,6 +83,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     generation_routing.init(app, openai_playground)
     profile_routing.init(app, openai_playground)
     admin_routing.init(app, openai_playground)
+    health_routing.init(app, openai_playground)
 
     with app.app_context():
         create_tables(app)
