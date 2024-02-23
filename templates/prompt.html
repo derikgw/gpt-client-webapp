@@ -1,0 +1,31 @@
+<!-- prompt.html -->
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+    <div class="conversation-history">
+
+    </div>
+
+    <div class="form-container">
+        <!-- Warning Message -->
+        <div class="warning-message">
+            <strong>Caution:</strong> Please do not enter any sensitive or personal information in your prompts.
+        </div>
+
+        <form id="promptForm" method="post" enctype="multipart/form-data">
+            <textarea id="promptInput" name="prompt" required rows="20" class="full-width-textarea"></textarea>
+            <input type="file" id="fileInput" name="files" multiple>
+            <button type="submit">Generate</button>
+        </form>
+        <button id="clearHistory" onclick="clearHistory()">Clear History</button>
+        <div id="responseContainer"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/codeBlockHandling.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ajaxHandling.js') }}"></script>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js" integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4" crossorigin="anonymous"></script>
+{% endblock %}
