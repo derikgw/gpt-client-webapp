@@ -29,6 +29,11 @@ def load_logged_in_user():
     else:
         g.current_user = User.query.get(user_id)
 
+@app.after_request
+def set_csp_header(response):
+    csp_policy = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net;"
+    response.headers['Content-Security-Policy'] = csp_policy
+    return response
 
 @app.context_processor
 def inject_user():

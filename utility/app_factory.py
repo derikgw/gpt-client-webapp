@@ -1,9 +1,11 @@
 import os
 from flask import Flask
 from flask_bcrypt import Bcrypt
+from flask_talisman import Talisman
+from flask_wtf.csrf import CSRFProtect
+
 from utility.db_utility import init_app, create_tables
 from utility.openai_playground import OpenAIPlayground
-from flask_wtf.csrf import CSRFProtect
 
 # Assuming you have an init_streaming function in extensions.streaming
 import routing.streaming as stream_routing
@@ -41,6 +43,17 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     csrf = CSRFProtect(app)
+
+    talisman = Talisman(app, content_security_policy={
+        'default-src': [
+            '\'self\'',
+            'https://trusted.cdn.com',
+        ],
+        'script-src': '\'self\'',
+        'object-src': '\'none\'',
+        # Add other directives as needed
+    })
+
     bcrypt = Bcrypt(app)
     api_key = os.environ.get('OPENAI_API_KEY')
 
