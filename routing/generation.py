@@ -1,6 +1,6 @@
 # generation.py
-from flask import Blueprint, request, jsonify, render_template, session, flash, redirect, url_for, current_app
-from utility.openai_playground import OpenAIPlayground  # Adjust this import to match your application structure
+from flask import Blueprint, request, jsonify, flash, redirect, current_app
+from utility.safe_urls import get_safe_redirect
 from session.governance import requires_login
 from markupsafe import escape
 import markdown
@@ -26,7 +26,7 @@ def init(app, openai_playground):
                 for file in files:
                     if file.filename == '':
                         flash('No selected file')
-                        return redirect(request.url)
+                        redirect(get_safe_redirect(request.url))
                     if file:  # If there is a file
                         # Read the content of the file
                         file_content = file.read().decode('utf-8')  # Assuming text files encoded in UTF-8
@@ -50,7 +50,8 @@ def init(app, openai_playground):
 
         except Exception as e:
             current_app.logger.error("An exception occurred: %s", str(e))
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "There was an error generating the response.  Please see application log for "
+                                     "details."}), 500
 
     # Register the blueprint with the app
     app.register_blueprint(generation_bp)
