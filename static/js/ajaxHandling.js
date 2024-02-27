@@ -20,7 +20,11 @@ document.addEventListener("DOMContentLoaded", function () {
         // Create the prompt box div
         const promptBox = document.createElement("div");
         promptBox.className = "prompt-box";
-        promptBox.innerHTML = `<strong>Prompt:</strong><p>${prompt}</p>`;
+        // Use textContent to safely set the text inside the paragraph
+        const promptText = document.createElement("p");
+        promptText.textContent = prompt; // Safely assigns text to the paragraph element
+        promptBox.innerHTML = "<strong>Prompt:</strong>"; // Static content can safely use innerHTML
+        promptBox.appendChild(promptText); // Append the paragraph to the prompt box
 
         // Create the response box div
         const responseBox = document.createElement("div");
