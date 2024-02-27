@@ -3,6 +3,7 @@ from flask import Flask
 from flask_bcrypt import Bcrypt
 from utility.db_utility import init_app, create_tables
 from utility.openai_playground import OpenAIPlayground
+from flask_wtf.csrf import CSRFProtect
 
 # Assuming you have an init_streaming function in extensions.streaming
 import routing.streaming as stream_routing
@@ -23,6 +24,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     app.config['MOCK_GPT_CALL'] = mock_gpt_call
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
     app.config['SECRET_KEY'] = os.environ.get('GPT_WEB_APP_AUTH_SECRET')
+
     database_dir = os.path.join(base_directory, 'data')
     if not os.path.exists(database_dir):
         os.makedirs(database_dir)
@@ -38,6 +40,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    csrf = CSRFProtect(app)
     bcrypt = Bcrypt(app)
     api_key = os.environ.get('OPENAI_API_KEY')
 

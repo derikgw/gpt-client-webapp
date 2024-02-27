@@ -16,6 +16,7 @@
         </div>
 
         <form id="promptForm" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <textarea id="promptInput" name="prompt" required rows="20" class="full-width-textarea"></textarea>
             <input type="file" id="fileInput" name="files" multiple>
             <button type="submit">Generate</button>
