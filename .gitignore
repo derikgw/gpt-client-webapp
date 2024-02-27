@@ -628,3 +628,4 @@ api_key.txt
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,intellij+all,visualstudio,visualstudiocode,eclipse
 /scripts/test_db_conn.py
+**/secret_key.txt
