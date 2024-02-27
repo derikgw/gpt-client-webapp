@@ -1,6 +1,6 @@
 # admin/admin_panel.py
 from flask import Blueprint, render_template, redirect, url_for, session, request, flash
-
+from utility.safe_urls import get_safe_redirect
 from session.governance import requires_role, requires_login
 from session.role import Role
 from utility.db_utility import db
@@ -20,7 +20,7 @@ def init(app, openai_playground):
 
         user = User.query.get(session['user_id'])
         if not user.is_admin:
-            return redirect(request.referrer or url_for('dashboard.dashboard'))
+            return redirect(get_safe_redirect('dashboard.dashboard'))
 
         users = User.query.all()
         roles = Role.query.all()
@@ -33,7 +33,7 @@ def init(app, openai_playground):
         user.active = True
         user.date_enabled = datetime.utcnow()
         db.session.commit()
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(get_safe_redirect('admin.admin_panel'))
 
     @admin_bp.route('/admin.deactivate-user/<int:user_id>', methods=['POST'])
     def deactivate_user(user_id):
@@ -41,7 +41,7 @@ def init(app, openai_playground):
         user = User.query.get(user_id)
         user.active = False
         db.session.commit()
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(get_safe_redirect('admin.admin_panel'))
 
     @admin_bp.route('/admin.delete-user/<int:user_id>', methods=['POST'])
     def delete_user(user_id):
@@ -49,7 +49,7 @@ def init(app, openai_playground):
         user = User.query.get(user_id)
         db.session.delete(user)
         db.session.commit()
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(get_safe_redirect('admin.admin_panel'))
 
     @admin_bp.route('/admin/update-user-role/<int:user_id>', methods=['POST'])
     @requires_role('admin')
@@ -59,7 +59,7 @@ def init(app, openai_playground):
         user.role_id = role_id
         db.session.commit()
         flash('User role updated successfully.', 'success')
-        return redirect(url_for('admin.admin_panel'))
+        return redirect(get_safe_redirect('admin.admin_panel'))
 
     # Register the blueprint with the app
     app.register_blueprint(admin_bp)
