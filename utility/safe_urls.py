@@ -1,19 +1,27 @@
 from flask import url_for, request
 from urllib.parse import urlparse, urljoin
 
+# Define a whitelist of allowed routes
+ALLOWED_ROUTES = ['admin.admin_panel', 'user.dashboard', 'auth.login']
 
-# Helper function to check if a URL is safe for redirection
+
+def is_allowed_url(target):
+    # Check if the path for the target is in the whitelist
+    for route in ALLOWED_ROUTES:
+        if url_for(route) == urlparse(target).path:
+            return True
+    return False
+
+
 def is_safe_url(target):
     # Parse the application's host URL
     ref_url = urlparse(request.host_url)
     # Parse the target URL to be tested
     test_url = urlparse(urljoin(request.host_url, target))
     # Check if the target URL's scheme is HTTP or HTTPS and belongs to the same domain
-    return test_url.scheme in ('http', 'https') and \
-        ref_url.netloc == test_url.netloc
+    return (test_url.scheme in ('http', 'https') and ref_url.netloc == test_url.netloc) and is_allowed_url(target)
 
 
-# Function to perform safe redirection
 def get_safe_redirect(redirect_route):
     # Get the referrer URL from the request
     destination = request.referrer
