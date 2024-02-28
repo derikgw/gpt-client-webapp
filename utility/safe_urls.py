@@ -4,7 +4,7 @@ from urllib.parse import urlparse, urljoin
 # Define a whitelist of allowed routes
 ALLOWED_ROUTES = [
     'admin.admin_panel',
-    'user.dashboard',
+    'dashboard.dashboard',
     'auth.login',
     'profile.update',  # Assuming 'profile.update' is the endpoint name
     'generation.create',  # Assuming 'generation.create' is the endpoint name
