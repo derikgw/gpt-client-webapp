@@ -1,0 +1,9 @@
+{
+    "default-src": ["'self'"],
+    "script-src": ["'self'", "https://cdn.jsdelivr.net", "https://cdn.socket.io"],
+    "style-src": ["'self'"],
+    "img-src": ["'self'"],
+    "connect-src": ["'self'"],
+    "font-src": ["'self'"],
+    "object-src": ["'none'"]
+}

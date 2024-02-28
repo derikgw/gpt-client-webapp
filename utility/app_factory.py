@@ -1,3 +1,4 @@
+import json
 import os
 from flask import Flask
 from flask_bcrypt import Bcrypt
@@ -38,33 +39,10 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
 
     csrf = CSRFProtect(app)
 
-    talisman = Talisman(app, content_security_policy={
-        'default-src': [
-            '\'self\'',  # Allows resources from the same origin
-        ],
-        'script-src': [
-            '\'self\'',  # Allows scripts hosted on your domain
-            'https://cdn.jsdelivr.net',  # Allows specific external scripts
-            'https://cdn.socket.io',
-        ],
-        'style-src': [
-            '\'self\'',  # Allows CSS hosted on your domain
-        ],
-        'img-src': [
-            '\'self\'',  # Allows images from the same origin
-            # Include other trusted image sources here if necessary
-        ],
-        'connect-src': [
-            '\'self\'',  # Allows AJAX requests to your domain
-            # Include other domains if you're making requests to external APIs
-        ],
-        'font-src': [
-            '\'self\'',  # Allows fonts from the same origin
-            # Add external font sources here if you use them
-        ],
-        'object-src': '\'none\'',  # Disallows all object/embed plugins
-        # Add other directives as needed
-    })
+    with open('csp.json', 'r') as file:
+        csp = json.load(file)
+
+    talisman = Talisman(app, content_security_policy=csp)
 
     bcrypt = Bcrypt(app)
     api_key = os.environ.get('OPENAI_API_KEY')
