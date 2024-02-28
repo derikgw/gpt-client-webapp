@@ -50,4 +50,9 @@ if __name__ == '__main__':
 
     app.logger.addHandler(handler)
 
-    app.run(host='0.0.0.0', port=80)
+    if os.environ.get('FLASK_ENV') == 'development':
+        cert_path = os.path.expanduser('~/.ssh/devcert.pem')
+        key_path = os.path.expanduser('~/.ssh/devkey.pem')
+        app.run(host='0.0.0.0', port=5005, ssl_context=(cert_path, key_path))
+    else:
+        app.run(host='0.0.0.0', port=443)
