@@ -1,6 +1,6 @@
 {
     "default-src": ["'self'"],
-    "script-src": ["'self'", "https://cdn.jsdelivr.net/npm/dompurify@2.3.4/dist/purify.min.js", "https://cdn.socket.io/4.7.4/socket.io.min.js"],
+    "script-src": ["'self'"],
     "style-src": ["'self'"],
     "img-src": ["'self'"],
     "connect-src": ["'self'"],
