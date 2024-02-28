@@ -39,7 +39,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
 
     csrf = CSRFProtect(app)
 
-    with open('csp.json', 'r') as file:
+    with open(f'{base_directory}/configs/csp.json', 'r') as file:
         csp = json.load(file)
 
     talisman = Talisman(app, content_security_policy=csp)
