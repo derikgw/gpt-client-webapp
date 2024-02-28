@@ -4,6 +4,8 @@ from flask_bcrypt import Bcrypt
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 
+from urllib.parse import quote
+
 from utility.db_utility import init_app, create_tables
 from utility.openai_playground import OpenAIPlayground
 
@@ -27,16 +29,9 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
     app.config['SECRET_KEY'] = os.environ.get('GPT_WEB_APP_AUTH_SECRET')
 
-    """
     app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f"mysql+pymysql://{os.environ.get('DB_USER')}:{os.environ.get('DB_PASS')}@"
+        f"mysql+pymysql://{os.environ.get('DB_USER')}:{quote(os.environ.get('DB_PASS'))}@"
         f"{os.environ.get('DB_HOST')}/{os.environ.get('DB_NAME', 'gpt_client')}"
-    )
-    """
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f"mysql+pymysql://{os.environ.get('DB_USER')}:{os.environ.get('DB_PASS')}@"
-        f"localhost/{os.environ.get('DB_NAME', 'gpt_client')}"
     )
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
