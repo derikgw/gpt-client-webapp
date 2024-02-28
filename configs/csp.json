@@ -1,9 +1,11 @@
 {
     "default-src": ["'self'"],
-    "script-src": ["'self'", "https://cdn.jsdelivr.net", "https://cdn.socket.io"],
+    "script-src": ["'self'", "https://cdn.jsdelivr.net/npm/dompurify@2.3.4/dist/purify.min.js", "https://cdn.socket.io/4.7.4/socket.io.min.js"],
     "style-src": ["'self'"],
     "img-src": ["'self'"],
     "connect-src": ["'self'"],
     "font-src": ["'self'"],
-    "object-src": ["'none'"]
+    "object-src": ["'none'"],
+    "frame-ancestors": ["'self'"],  // Only allow framing of your content by your own site
+    "form-action": ["'self'"]       // Only allow forms to submit to your own site
 }
