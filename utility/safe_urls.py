@@ -2,10 +2,18 @@ from flask import url_for, request
 from urllib.parse import urlparse, urljoin
 
 # Define a whitelist of allowed routes
-ALLOWED_ROUTES = ['admin.admin_panel', 'user.dashboard', 'auth.login']
+ALLOWED_ROUTES = [
+    'admin.admin_panel',
+    'user.dashboard',
+    'auth.login',
+    'profile.update',  # Assuming 'profile.update' is the endpoint name
+    'generation.create',  # Assuming 'generation.create' is the endpoint name
+    'main.index'
+]
 
 
 def is_allowed_url(target):
+    print(f'target: {target}')
     # Check if the path for the target is in the whitelist
     for route in ALLOWED_ROUTES:
         if url_for(route) == urlparse(target).path:
