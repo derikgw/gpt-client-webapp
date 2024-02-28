@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".conversation-history").innerHTML = savedHistory;
     }
 
+    document.getElementById("clearHistory").addEventListener("click", clearHistory);
+
     document.getElementById("promptForm").addEventListener("submit", function (e) {
         e.preventDefault();
         const prompt = document.getElementById("promptInput").value;
