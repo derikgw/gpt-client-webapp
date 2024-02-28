@@ -6,6 +6,6 @@
     "connect-src": ["'self'"],
     "font-src": ["'self'"],
     "object-src": ["'none'"],
-    "frame-ancestors": ["'self'"],  // Only allow framing of your content by your own site
-    "form-action": ["'self'"]       // Only allow forms to submit to your own site
+    "frame-ancestors": ["'self'"],
+    "form-action": ["'self'"]
 }
