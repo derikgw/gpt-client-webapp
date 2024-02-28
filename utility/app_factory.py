@@ -27,18 +27,10 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
     app.config['MOCK_RESPONSE_FILE'] = mock_response_file
     app.config['SECRET_KEY'] = os.environ.get('GPT_WEB_APP_AUTH_SECRET')
 
-    database_dir = os.path.join(base_directory, 'data')
-    if not os.path.exists(database_dir):
-        os.makedirs(database_dir)
-    database_path = os.path.join(database_dir, 'users.db')
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(database_path)
-
     app.config['SQLALCHEMY_DATABASE_URI'] = (
         f"mysql+pymysql://{os.environ.get('DB_USER')}:{os.environ.get('DB_PASS')}@"
-        f"{os.environ.get('DB_HOST', 'dgw-gpt-web-app-db-1.c14eqauu2cjj.us-east-2.rds.amazonaws.com')}/{os.environ.get('DB_NAME', 'gpt_client')}"
+        f"{os.environ.get('DB_HOST')}/{os.environ.get('DB_NAME', 'gpt_client')}"
     )
-
-    print(app.config['SQLALCHEMY_DATABASE_URI'])
 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -46,11 +38,28 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
 
     talisman = Talisman(app, content_security_policy={
         'default-src': [
-            '\'self\'',
-            'https://trusted.cdn.com',
+            '\'self\'',  # Allows resources from the same origin
         ],
-        'script-src': '\'self\'',
-        'object-src': '\'none\'',
+        'script-src': [
+            '\'self\'',  # Allows scripts hosted on your domain
+            'https://cdn.jsdelivr.net',  # Allows specific external scripts
+        ],
+        'style-src': [
+            '\'self\'',  # Allows CSS hosted on your domain
+        ],
+        'img-src': [
+            '\'self\'',  # Allows images from the same origin
+            # Include other trusted image sources here if necessary
+        ],
+        'connect-src': [
+            '\'self\'',  # Allows AJAX requests to your domain
+            # Include other domains if you're making requests to external APIs
+        ],
+        'font-src': [
+            '\'self\'',  # Allows fonts from the same origin
+            # Add external font sources here if you use them
+        ],
+        'object-src': '\'none\'',  # Disallows all object/embed plugins
         # Add other directives as needed
     })
 
