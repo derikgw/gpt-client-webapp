@@ -45,6 +45,7 @@ def create_app(base_directory=None, mock_gpt_call=False, mock_response_file=None
         'script-src': [
             '\'self\'',  # Allows scripts hosted on your domain
             'https://cdn.jsdelivr.net',  # Allows specific external scripts
+            'https://cdn.socket.io',
         ],
         'style-src': [
             '\'self\'',  # Allows CSS hosted on your domain
